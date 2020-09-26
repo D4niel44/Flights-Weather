@@ -1,6 +1,9 @@
 # P1-App
 Proyecto 1 Modelado y Programación 2021-1
 
+## Requisitos del Proyecto
+- [PDF](PDF/Proyecto01_WebService.pdf)
+
 ## Enlaces Útiles
 - Apis:
   - [OpenWeathermap](https://openweathermap.org/)
