@@ -17,3 +17,6 @@ Proyecto 1 Modelado y Programación 2021-1
   - Limite: 2000 requests al día.
 ### [OpenWeathermap](https://openweathermap.org/)
   - Limite: 60 requests por minuto.
+
+## Análisis del Proyecto
+- [PDF](PDF/Análisis.pdf)
