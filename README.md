@@ -20,3 +20,6 @@ Proyecto 1 Modelado y Programación 2021-1
 
 ## Análisis del Proyecto
 - [Analisis](PDF/Análisis.pdf)
+
+## Pruebas de la API
+- [Postman](https://app.getpostman.com/join-team?invite_code=80b7daf2eb1e0904270af63bed78494a)
