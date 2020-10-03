@@ -15,15 +15,13 @@ func NewAPI(hash string) *API {
 // Requires the city to be city recognized by OpenWeatherMap.
 // Note this method does not validate the city before making the request,
 // so calling this method with an invalid  city will make a request to the API.
-// Units and Language are optional parameters, Language defaults to SPANISH and
-// units defaults to METRIC.
 func (api *API) GetWeatherFromCity(city string, units Units, lang Language) (*Weather, error) {
 	panic("not implemented") // TODO
 }
 
 // GetWeatherFromCoordinates gets the weather for the given coordinates.
 // Requires -90 < lat < 90 and -180 < lon < 180.
-func (api *API) GetWeatherFromCoordinates(lat, lon int, units Units, lang Language) (*Weather, error) {
+func (api *API) GetWeatherFromCoordinates(lat, lon float32, units Units, lang Language) (*Weather, error) {
 	panic("not implemented") // TODO
 }
 
