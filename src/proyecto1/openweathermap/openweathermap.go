@@ -3,6 +3,7 @@ package openweathermap
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -22,6 +23,9 @@ func NewAPI(hash string) *API {
 // Note this method does not validate the city before making the request,
 // so calling this method with an invalid  city will make a request to the API.
 func (api *API) GetWeatherFromCity(city string, units Units, lang Language) (*Weather, error) {
+	if city == "" {
+		return nil, errors.New("city must be a nonempty string")
+	}
 	urlBuilder := api.baseURLBuilder(units, lang)
 	urlBuilder.addParameter("q", city)
 	return makeQuery(urlBuilder.makeURL())
@@ -30,6 +34,9 @@ func (api *API) GetWeatherFromCity(city string, units Units, lang Language) (*We
 // GetWeatherFromCoordinates gets the weather for the given coordinates.
 // Requires -90 < lat < 90 and -180 < lon < 180.
 func (api *API) GetWeatherFromCoordinates(lat, lon float32, units Units, lang Language) (*Weather, error) {
+	if lat < -90 || lat > 90 || lon < -180 || lon > 180 {
+		return nil, errors.New("wrong coordinates")
+	}
 	urlBuilder := api.baseURLBuilder(units, lang)
 	urlBuilder.addParameter("lat", fmt.Sprintf("%.2f", lat))
 	urlBuilder.addParameter("lon", fmt.Sprintf("%.2f", lon))
