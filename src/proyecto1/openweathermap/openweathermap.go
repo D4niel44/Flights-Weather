@@ -1,6 +1,12 @@
 // Package openweathermap provides methods for easily querying OpenWeatherMap API.
 package openweathermap
 
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
+
 // API represents an OpenWatherApi client to make climate and weather requests.
 type API struct {
 	hash string
@@ -16,13 +22,43 @@ func NewAPI(hash string) *API {
 // Note this method does not validate the city before making the request,
 // so calling this method with an invalid  city will make a request to the API.
 func (api *API) GetWeatherFromCity(city string, units Units, lang Language) (*Weather, error) {
-	panic("not implemented") // TODO
+	urlBuilder := api.baseURLBuilder(units, lang)
+	urlBuilder.addParameter("q", city)
+	return makeQuery(urlBuilder.makeURL())
 }
 
 // GetWeatherFromCoordinates gets the weather for the given coordinates.
 // Requires -90 < lat < 90 and -180 < lon < 180.
 func (api *API) GetWeatherFromCoordinates(lat, lon float32, units Units, lang Language) (*Weather, error) {
-	panic("not implemented") // TODO
+	urlBuilder := api.baseURLBuilder(units, lang)
+	urlBuilder.addParameter("lat", fmt.Sprintf("%.2f", lat))
+	urlBuilder.addParameter("lon", fmt.Sprintf("%.2f", lon))
+	return makeQuery(urlBuilder.makeURL())
+}
+
+const baseURL = "https://api.openweathermap.org/data/2.5/weather?"
+
+// Creates an urlBuilder with common parameters for both requests
+func (api *API) baseURLBuilder(units Units, lang Language) *getRequestURLBuilder {
+	urlBuilder := newGetRequestURLBuilder(baseURL)
+	urlBuilder.addParameter("appid", api.hash)
+	urlBuilder.addParameter("units", string(units))
+	urlBuilder.addParameter("lang", string(lang))
+	return urlBuilder
+}
+
+// Queries the url and returns and struct containing the response
+func makeQuery(url string) (*Weather, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	weather := &Weather{}
+	jsonErr := json.NewDecoder(resp.Body).Decode(weather)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+	return weather, nil
 }
 
 // Units is an enum for temperature units in an Api response.
@@ -67,4 +103,29 @@ type Weather struct {
 	} `json:"main"`
 }
 
-const baseURL = "api.openweathermap.org/data/2.5/weather"
+type getRequestURLBuilder struct {
+	base   string
+	params map[string]string
+}
+
+func newGetRequestURLBuilder(baseURL string) *getRequestURLBuilder {
+	return &getRequestURLBuilder{base: baseURL, params: make(map[string]string)}
+}
+
+func (r *getRequestURLBuilder) addParameter(key, value string) {
+	r.params[key] = value
+}
+
+func (r *getRequestURLBuilder) makeURL() string {
+	url := r.base
+	i := 1
+	length := len(r.params)
+	for key, value := range r.params {
+		url += fmt.Sprintf("%s=%s", key, value)
+		if i != length {
+			url += "&"
+		}
+		i++
+	}
+	return url
+}
