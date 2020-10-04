@@ -56,10 +56,14 @@ func (api *API) baseURLBuilder(units Units, lang Language) *getRequestURLBuilder
 
 // Queries the url and returns and struct containing the response
 func makeQuery(url string) (*Weather, error) {
+	// make query
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
+	// decode response
 	weather := &Weather{}
 	jsonErr := json.NewDecoder(resp.Body).Decode(weather)
 	if jsonErr != nil {
