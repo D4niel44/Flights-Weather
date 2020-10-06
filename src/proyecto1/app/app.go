@@ -1,14 +1,31 @@
 package main
 
-import owm "myp.ciencias.unam.mx/proyecto1/openweathermap"
+// TODO Investigate separating module app from main.
+import (
+	"fmt"
+	"time"
+
+	owm "myp.ciencias.unam.mx/proyecto1/openweathermap"
+)
 
 // Runs the app.
 func main() {
 	panic("not implemented") // TODO
 }
 
+// App struct that represents an App for querying cities weather.
+type App struct {
+	API *owm.API
+}
+
+// NewApp Creates A New App
+func NewApp(apiKey string) *App {
+	return &App{API: owm.NewAPI(apiKey)}
+}
+
 // TODO Improve documentation.
-// Process the file in the given path and returns a a list of all flights
+
+// HandleDataSet Process the file in the given path and returns a a list of all flights
 // in the dataset, and a map of unique cities by name to its respective city
 // structure.
 //
@@ -23,34 +40,53 @@ func main() {
 // destination_latitude|latitud_destino destination city latitude coordinate
 // destination_longitude|longitud_destino destination city longitude coordinate
 // This method will try to return the names in a OpenWeatherMap call ready string.
-func handleDataSet(dataset string) (*[]flight, *map[string]*city) {
+func (app *App) HandleDataSet(dataset string) (*[]*Flight, *map[string]*City) {
 	panic("not implemented") // TODO
 }
 
-// Requests the weather for all cities in the map and saves the result in
+// QueryWeather Requests the weather for all cities in the map and saves the result in
 // the wethaer field of city.
 //
 // Requires the weather field of city to be nil.
-func queryWeather(*map[string]*city) {
-	panic("not implemented") // TODO
+func (app *App) QueryWeather(cities *map[string]*City) {
+	queriesCounter := 0
+	for cityName, city := range *cities {
+		if queriesCounter > 55 {
+			time.Sleep(time.Minute)
+			queriesCounter = 0
+		}
+		cityWeather, err := app.API.GetWeatherFromCity(cityName, owm.METRIC, owm.ES)
+		if err != nil {
+			fmt.Printf("ERROR: %v, \n", err)
+		} else {
+			city.weather = cityWeather
+		}
+		queriesCounter++
+	}
 }
 
 // TODO improve documentation.
-// Prints the weather.
-func printWeather(*[]flight) {
+
+// PrintWeather Prints the weather to standard output
+func PrintWeather(*[]*Flight) {
 	panic("not implemented") // TODO
 }
 
-type flight struct {
-	origin      *city
-	destination *city
+// Flight is a struct representing a flight
+type Flight struct {
+	origin      *City
+	destination *City
 }
 
-type city struct {
+// City is a struct representing a city
+type City struct {
 	name        *string
-	coordinates struct {
-		lat float32
-		lon float32
-	}
-	weather *owm.Weather
+	coordinates Coordinates
+	weather     *owm.Weather
+}
+
+// Coordinates is a struct representing coordinates
+type Coordinates struct {
+	lat float32
+	lon float64
 }
