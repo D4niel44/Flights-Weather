@@ -24,11 +24,22 @@ type JsonCity struct {
 	} `json:"coord"`
 }
 
+type JsonAirport struct {
+	City    string `json:"city"`
+	Country string `json:"country"`
+	IATA    string `json:"iata"`
+	ICAO    string `json:"icao"`
+	Lat     string `json:"latitude"`
+	Lon     string `json:"longitude"`
+	Name    string `json:"name"`
+}
+
 const (
 	citiesDataSource   = "data_sources/city.list.json"
 	airportsDataSource = "data_sources/airports.json"
 )
 
+// make this look nicer
 func main() {
 	// Open File for cities
 	citiesFile, err := os.Open(citiesDataSource)
@@ -61,8 +72,8 @@ func main() {
 		id INTEGER PRIMARY KEY,
 		name TEXT NOT NULL,
 		country TEXT NOT NULL,
-		lon REAL NOT NULL,
-		lat REAL NOT NULL
+		lat REAL NOT NULL,
+		lon REAL NOT NULL
 	);
 	`
 	statement, err := db.Prepare(citiesTable)
@@ -71,15 +82,75 @@ func main() {
 	}
 	statement.Exec()
 
+	transaction, _ := db.Begin()
 	for _, city := range cities {
-		insertCity := fmt.Sprintf(`INSERT INTO city(id, name, country, lon, lat) VALUES (%.0f, "%s", "%s", %.2f, %.2f);`,
+		insertCity := fmt.Sprintf(`INSERT INTO city(id, name, country, lat, lon) VALUES (%.0f, "%s", "%s", %.2f, %.2f);`,
 			city.ID, toAlphaNumeric(city.Name), toAlphaNumeric(city.Country), city.Coordinates.Lat, city.Coordinates.Lon)
-		statement, err := db.Prepare(insertCity)
+		_, err := transaction.Exec(insertCity)
 		if err != nil {
+			transaction.Rollback()
 			panic(fmt.Sprintf("Error while inserting city. \n %s \n %v", insertCity, err))
 		}
-		statement.Exec()
 	}
+	transaction.Commit()
+
+	airportsFile, err := os.Open(airportsDataSource)
+	if err != nil {
+		panic("Error opening cities json")
+	}
+	defer airportsFile.Close()
+
+	// Decode airports file into memory
+	var airports map[string]JsonAirport
+	err = json.NewDecoder(airportsFile).Decode(&airports)
+	if err != nil {
+		panic(fmt.Sprintf("Error at decoding airports file. \n %v", err))
+	}
+
+	// Create table for Airports
+	airportsTable := `CREATE TABLE airports (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		city INTEGER,
+		country TEXT NOT NULL,
+		iata TEXT NOT NULL,
+		icao TEXT NOT NULL,
+		lat REAL NOT NULL,
+		lon REAL NOT NULL,
+		name TEXT NOT NULL
+	);
+	`
+	statement, err = db.Prepare(airportsTable)
+	if err != nil {
+		panic(fmt.Sprintf("Error in query preparing \n %s \n %v", airportsTable, err))
+	}
+	statement.Exec()
+
+	transaction, _ = db.Begin()
+	for _, airport := range airports {
+		cityName := toAlphaNumeric(airport.City)
+		row := transaction.QueryRow(fmt.Sprintf("SELECT id FROM city WHERE name='%s';", cityName))
+		var cityID string
+		err = row.Scan(&cityID)
+		if err != nil {
+			fmt.Printf("City not found for %s. Setting value to null \n", cityName)
+			cityID = "null" // If no equivalent openweathermap city then set the value to null in the table
+		}
+		insertAirport := fmt.Sprintf(`INSERT INTO airports (city, country, iata, icao, lat, lon, name) VALUES (%s, "%s", "%s", "%s", %s, %s, "%s");`,
+			cityID,
+			toAlphaNumeric(airport.Country),
+			airport.IATA,
+			airport.ICAO,
+			airport.Lat,
+			airport.Lon,
+			toAlphaNumeric(airport.Name))
+		_, err := transaction.Exec(insertAirport)
+		if err != nil {
+			transaction.Rollback()
+			panic(fmt.Sprintf("Error while inserting airport. \n %s \n %v", insertAirport, err))
+		}
+	}
+	transaction.Commit()
+
 }
 
 func toAlphaNumeric(ugly string) string {
