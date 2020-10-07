@@ -57,7 +57,7 @@ func (app *App) QueryWeather(cities *map[string]*City) {
 		}
 		cityWeather, err := app.API.GetWeatherFromCity(cityName, owm.METRIC, owm.ES)
 		if err != nil {
-			fmt.Printf("ERROR: %v, \n", err)
+			fmt.Printf("ERROR: %v, \n", err) // TODO Rework this using logger
 		} else {
 			city.weather = cityWeather
 		}
