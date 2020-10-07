@@ -17,6 +17,7 @@ import (
 type JsonCity struct {
 	ID          float64 `json:"id"`
 	Name        string  `json:"name"`
+	State       string  `json:"state"`
 	Country     string  `json:"country"`
 	Coordinates struct {
 		Lat float32 `json:"lat"`
@@ -72,6 +73,7 @@ func main() {
 	citiesTable := `CREATE TABLE city (
 		id INTEGER PRIMARY KEY,
 		name TEXT NOT NULL,
+		state 	TEXT,
 		country TEXT NOT NULL,
 		lat REAL NOT NULL,
 		lon REAL NOT NULL
@@ -85,8 +87,14 @@ func main() {
 
 	transaction, _ := db.Begin()
 	for _, city := range cities {
-		insertCity := fmt.Sprintf(`INSERT INTO city(id, name, country, lat, lon) VALUES (%.0f, "%s", "%s", %.2f, %.2f);`,
-			city.ID, toAlphaNumeric(city.Name), toAlphaNumeric(city.Country), city.Coordinates.Lat, city.Coordinates.Lon)
+		var cityState string
+		if city.State == "" {
+			cityState = "null"
+		} else {
+			cityState = fmt.Sprintf("\"%s\"", city.State)
+		}
+		insertCity := fmt.Sprintf(`INSERT INTO city(id, name, state, country, lat, lon) VALUES (%.0f, "%s", %s, "%s", %.2f, %.2f);`,
+			city.ID, toAlphaNumeric(city.Name), cityState, city.Country, city.Coordinates.Lat, city.Coordinates.Lon)
 		_, err := transaction.Exec(insertCity)
 		if err != nil {
 			transaction.Rollback()
