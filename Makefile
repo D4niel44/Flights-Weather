@@ -5,3 +5,6 @@ test:
 
 createDB:
 	cd scripts/ && go build && ./scripts
+
+clean:
+	rm -r bin && rm scripts/scripts
