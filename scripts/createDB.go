@@ -39,6 +39,7 @@ const (
 	airportsDataSource = "data_sources/airports.json"
 )
 
+// TODO Refactor this.
 // make this look nicer
 func main() {
 	// Open File for cities
