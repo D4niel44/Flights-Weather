@@ -24,6 +24,7 @@ func NewAPI(hash string) *API {
 // Requires the city to be city recognized by OpenWeatherMap.
 // Note this method does not validate the city before making the request,
 // so calling this method with an invalid  city will make a request to the API.
+// Returns an error if the city was not found in OpenWeatherMap
 func (api *API) GetWeatherFromCity(city string, units Units, lang Language) (*Weather, error) {
 	if city == "" {
 		return nil, errors.New("city must be a nonempty string")
@@ -58,6 +59,9 @@ func makeQuery(url string) (*Weather, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode == 404 {
+		return nil, errors.New("city not found")
 	}
 	defer resp.Body.Close()
 
