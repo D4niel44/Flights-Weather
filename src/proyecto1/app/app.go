@@ -173,7 +173,7 @@ func (app *App) QueryWeather(cities map[string]*City) {
 		}
 		if err != nil {
 			// FIXME strange value bug.
-			fmt.Printf("ERROR: %v, \n %v %s", err, city.coordinate, city.name) // TODO Rework this using logger
+			fmt.Printf("ERROR: %v, \n", err) // TODO Rework this using logger
 		} else {
 			city.weather = cityWeather
 		}
@@ -186,9 +186,9 @@ func (app *App) QueryWeather(cities map[string]*City) {
 // PrintWeather Prints the weather to standard output
 func PrintWeather(flights *[]*Flight) {
 	for _, flight := range *flights {
-		fmt.Print("####################### \n")
+		fmt.Println("##########################")
 		printCityWeather("Origen", flight.origin)
-		fmt.Print("----------------------- \n")
+		fmt.Println("--------------------------")
 		printCityWeather("Destino", flight.destination)
 	}
 }
@@ -198,7 +198,7 @@ func PrintWeather(flights *[]*Flight) {
 func printCityWeather(header string, city *City) {
 	fmt.Printf("%s: %s \n", header, city.name)
 	if city.weather == nil {
-		fmt.Print("Clima no Encontrado")
+		fmt.Println("Clima no Encontrado")
 	} else {
 		fmt.Printf("Descripcion: %s \n", city.weather.Weather[0].Description)
 		fmt.Printf("Temperatura Mínima: %.1f °C\n", city.weather.Main.TempMin)

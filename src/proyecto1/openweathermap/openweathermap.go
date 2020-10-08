@@ -38,18 +38,24 @@ const (
 // Weather represents a json response from OpenWeatherAPI.
 // For simplicity only some fields of the OpenWeatherMap reponse are provided.
 type Weather struct {
-	Weather []struct {
-		ID          int    `json:"id"`
-		Main        string `json:"name"`
-		Description string `json:"description"`
-	} `json:"weather"`
-	Main struct {
-		Temp      float32 `json:"temp"`
-		FeelsLike float32 `json:"feels_like"`
-		TempMin   float32 `json:"temp_min"`
-		TempMax   float32 `json:"temp_max"`
-		Humidity  float32 `json:"humidity"`
-	} `json:"main"`
+	Weather []WeatherDescription `json:"weather"`
+	Main    WeatherData          `json:"main"`
+}
+
+// WeatherDescription represents a description of current weather conditions.
+type WeatherDescription struct {
+	ID          int    `json:"id"`
+	Main        string `json:"name"`
+	Description string `json:"description"`
+}
+
+// WeatherData contains main weather indicators, like temperature and humidity
+type WeatherData struct {
+	Temp      float32 `json:"temp"`
+	FeelsLike float32 `json:"feels_like"`
+	TempMin   float32 `json:"temp_min"`
+	TempMax   float32 `json:"temp_max"`
+	Humidity  float32 `json:"humidity"`
 }
 
 // API represents an OpenWatherApi client to make climate and weather requests.

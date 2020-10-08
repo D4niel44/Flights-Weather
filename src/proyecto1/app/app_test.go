@@ -9,7 +9,7 @@ import (
 const (
 	testAPIKey      = "fc249a737bd3772566de957539505054"
 	testDBPath      = "../../../bin/db/cities.db"
-	testDatasetPath = "../../../datasets/"
+	testDatasetPath = "../../../testDatasets/"
 )
 
 var app = NewApp(testAPIKey, testDBPath)
