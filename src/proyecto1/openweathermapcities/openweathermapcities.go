@@ -55,7 +55,7 @@ func (citiesConverter *OwmCityConverter) Close() {
 // GetCityCoordinates returns the city coordinates related to the given string, if any.
 // The string paramater may be both a city name or an airport IATA code.
 // Returns an error if this method fails to connect to database.
-func (citiesConverter *OwmCityConverter) GetCityCoordinates(name string) (*g.Coordinates, error) {
+func (citiesConverter *OwmCityConverter) GetCityCoordinates(name string) (*g.Coordinate, error) {
 	if len(name) == 3 { // if three word length then string may be IATA code.
 		coordinate, err := citiesConverter.getCoordinatesByAirportCode("iata", name)
 		if err == nil {
@@ -70,7 +70,7 @@ func (citiesConverter *OwmCityConverter) GetCityCoordinates(name string) (*g.Coo
 	}
 	// If none of the above search by City Name or Airport Name.
 	normalizedName := ToAlphaNumeric(name)
-	var coordinate *Coordinates
+	var coordinate *g.Coordinate
 	coordinate, err := citiesConverter.getCoordinatesFromDB("name", "airports", normalizedName)
 	if err == nil {
 		return coordinate, nil
@@ -98,7 +98,7 @@ func (citiesConverter *OwmCityConverter) GetCityCoordinates(name string) (*g.Coo
 }
 
 // gets the coordinate
-func (citiesConverter *OwmCityConverter) getCoordinatesByAirportCode(code, value string) (*Coordinate, error) {
+func (citiesConverter *OwmCityConverter) getCoordinatesByAirportCode(code, value string) (*g.Coordinate, error) {
 	capitalizedValue := strings.ToUpper(value)
 	coordinate, err := citiesConverter.getCoordinatesFromDB(code, "airports", capitalizedValue)
 	if err != nil {
@@ -112,7 +112,7 @@ func (citiesConverter *OwmCityConverter) getCoordinatesByAirportCode(code, value
 func (citiesConverter *OwmCityConverter) getCoordinatesFromDB(column, table, value string) (*g.Coordinate, error) {
 	query := fmt.Sprintf(`SELECT lat, lon FROM %s WHERE %s='%s';`, table, column, value)
 	row := citiesConverter.citiesDB.QueryRow(query)
-	coordinate := Coordinate{}
+	coordinate := g.Coordinate{}
 	err := row.Scan(&coordinate.Lat, &coordinate.Lon)
 	if err != nil {
 		return nil, err
