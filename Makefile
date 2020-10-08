@@ -9,3 +9,13 @@ createDB:
 
 clean:
 	rm -r bin && rm scripts/scripts
+
+compile:
+	cd src/proyecto1/app/ && go build
+	mv src/proyecto1/app/app bin/app
+
+build:
+	make clean
+	make test
+	make createDB
+	make compile
