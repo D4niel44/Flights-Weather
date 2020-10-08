@@ -30,7 +30,7 @@ type City struct {
 
 var defaultCity = City{
 	name:       "Mexico City",
-	coordinate: &g.Coordinate{19.4363, -99.072098},
+	coordinate: &g.Coordinate{Lat: 19.4363, Lon: -99.072098},
 }
 
 // App struct that represents an App for querying cities weather.
