@@ -3,6 +3,8 @@ package openweathermap
 import (
 	"fmt"
 	"testing"
+
+	g "myp.ciencias.unam.mx/geo"
 )
 
 const testAPIKey = "fc249a737bd3772566de957539505054"
@@ -50,26 +52,25 @@ func TestGetWeatherFromCity(t *testing.T) {
 // TestGetWeatherFromCoordinates test GetWeatherFromCoordinates method.
 func TestGetWeatherFromCoordinates(t *testing.T) {
 	testCases := []struct {
-		lat   float32
-		lon   float32
-		units Units
-		lang  Language
+		coordinate g.Coordinate
+		units      Units
+		lang       Language
 	}{
-		{0, 0, METRIC, ES},
-		{90, 180, IMPERIAL, ES},
-		{90, -180, STANDARD, ES},
-		{-90, 180, METRIC, FR},
-		{-90, -180, METRIC, EN},
-		{-5.67, 89, METRIC, EN},
-		{8.9, -86, METRIC, EN},
-		{-89, -76, METRIC, EN},
-		{89, 76, METRIC, EN},
+		{g.Coordinate{0, 0}, METRIC, ES},
+		{g.Coordinate{90, 180}, IMPERIAL, ES},
+		{g.Coordinate{90, -180}, STANDARD, ES},
+		{g.Coordinate{-90, 180}, METRIC, FR},
+		{g.Coordinate{-90, -180}, METRIC, EN},
+		{g.Coordinate{-5.67, 89}, METRIC, EN},
+		{g.Coordinate{8.9, -86}, METRIC, EN},
+		{g.Coordinate{-89, -76}, METRIC, EN},
+		{g.Coordinate{89, 76}, METRIC, EN},
 	}
 
 	for _, tc := range testCases {
-		testName := fmt.Sprintf("%.2f, %.2f, %v, %v", tc.lat, tc.lon, tc.units, tc.lang)
+		testName := fmt.Sprintf("%.2f, %.2f, %v, %v", tc.coordinate.Lat, tc.coordinate.Lon, tc.units, tc.lang)
 		t.Run(testName, func(t *testing.T) {
-			response, err := api.GetWeatherFromCoordinates(tc.lat, tc.lon, tc.units, tc.lang)
+			response, err := api.GetWeatherFromCoordinates(tc.coordinate, tc.units, tc.lang)
 			if err != nil {
 				t.Errorf("Unexpected error %v", err)
 			}

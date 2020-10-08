@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	g "myp.ciencias.unam.mx/geo"
 )
 
 // API represents an OpenWatherApi client to make climate and weather requests.
@@ -31,15 +33,11 @@ func (api *API) GetWeatherFromCity(city string, units Units, lang Language) (*We
 	return makeQuery(urlBuilder.makeURL())
 }
 
-// GetWeatherFromCoordinates gets the weather for the given coordinates.
-// Requires -90 < lat < 90 and -180 < lon < 180.
-func (api *API) GetWeatherFromCoordinates(lat, lon float32, units Units, lang Language) (*Weather, error) {
-	if lat < -90 || lat > 90 || lon < -180 || lon > 180 {
-		return nil, errors.New("wrong coordinates")
-	}
+// GetWeatherFromCoordinates gets the weather for the given coordinate.
+func (api *API) GetWeatherFromCoordinates(coordinate g.GeoPoint, units Units, lang Language) (*Weather, error) {
 	urlBuilder := api.baseURLBuilder(units, lang)
-	urlBuilder.addParameter("lat", fmt.Sprintf("%.2f", lat))
-	urlBuilder.addParameter("lon", fmt.Sprintf("%.2f", lon))
+	urlBuilder.addParameter("lat", fmt.Sprintf("%.2f", coordinate.Latitude()))
+	urlBuilder.addParameter("lon", fmt.Sprintf("%.2f", coordinate.Longitude()))
 	return makeQuery(urlBuilder.makeURL())
 }
 

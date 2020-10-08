@@ -14,6 +14,8 @@ import (
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
+
+	g "myp.ciencias.unam.mx/geo"
 )
 
 const (
@@ -53,7 +55,7 @@ func (citiesConverter *OwmCityConverter) Close() {
 // GetCityCoordinates returns the city coordinates related to the given string, if any.
 // The string paramater may be both a city name or an airport IATA code.
 // Returns an error if this method fails to connect to database.
-func (citiesConverter *OwmCityConverter) GetCityCoordinates(name string) (*Coordinates, error) {
+func (citiesConverter *OwmCityConverter) GetCityCoordinates(name string) (*g.Coordinates, error) {
 	if len(name) == 3 { // if three word length then string may be IATA code.
 		coordinate, err := citiesConverter.getCoordinatesByAirportCode("iata", name)
 		if err == nil {
@@ -96,7 +98,7 @@ func (citiesConverter *OwmCityConverter) GetCityCoordinates(name string) (*Coord
 }
 
 // gets the coordinate
-func (citiesConverter *OwmCityConverter) getCoordinatesByAirportCode(code, value string) (*Coordinates, error) {
+func (citiesConverter *OwmCityConverter) getCoordinatesByAirportCode(code, value string) (*Coordinate, error) {
 	capitalizedValue := strings.ToUpper(value)
 	coordinate, err := citiesConverter.getCoordinatesFromDB(code, "airports", capitalizedValue)
 	if err != nil {
@@ -107,15 +109,15 @@ func (citiesConverter *OwmCityConverter) getCoordinatesByAirportCode(code, value
 
 // Method for querying lat and coordinates to the database.
 // Returns the coordinates of the matching row of the query or an error if it was not found.
-func (citiesConverter *OwmCityConverter) getCoordinatesFromDB(column, table, value string) (*Coordinates, error) {
+func (citiesConverter *OwmCityConverter) getCoordinatesFromDB(column, table, value string) (*g.Coordinate, error) {
 	query := fmt.Sprintf(`SELECT lat, lon FROM %s WHERE %s='%s';`, table, column, value)
 	row := citiesConverter.citiesDB.QueryRow(query)
-	coordinates := Coordinates{}
-	err := row.Scan(&coordinates.lat, &coordinates.lon)
+	coordinate := Coordinate{}
+	err := row.Scan(&coordinate.Lat, &coordinate.Lon)
 	if err != nil {
 		return nil, err
 	}
-	return &coordinates, nil
+	return &coordinate, nil
 }
 
 // ToAlphaNumeric converts the given string to an only alphanumeric  strings without spaces.
@@ -127,9 +129,4 @@ func ToAlphaNumeric(ugly string) string {
 	})), norm.NFC)
 	pretty, _, _ := transform.String(t, ugly)
 	return pretty
-}
-
-type Coordinates struct {
-	lat float32
-	lon float32
 }
