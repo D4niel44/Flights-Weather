@@ -7,6 +7,9 @@ test:
 createDB:
 	cd scripts/ && go build && ./scripts
 
+loadDatasets:
+	mkdir -p bin/datasets && cp datasets/* bin/datasets
+
 clean:
 	rm -r bin && rm scripts/scripts
 
@@ -16,6 +19,7 @@ compile:
 
 build:
 	make clean
-	make test
 	make createDB
+	make loadDatasets
+	make test
 	make compile
