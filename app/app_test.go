@@ -28,7 +28,6 @@ func testDataset(dataset string, t *testing.T) {
 	PrintWeather(flights)
 }
 
-// TODO Improve tests to check no ban when more than 60 cities are requested.
 // TestWueryTest runs simple test to check QueryTest is working
 func TestQuerySet(t *testing.T) {
 	cityName := "Mexico City"

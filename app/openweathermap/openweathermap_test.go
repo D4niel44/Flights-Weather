@@ -21,8 +21,6 @@ func TestNewAPI(t *testing.T) {
 	}
 }
 
-// TODO Refactor GetWeather tests.
-
 // TestGetWeatherFromCity test GetWeatherFromCity method.
 func TestGetWeatherFromCity(t *testing.T) {
 	testCases := []struct {

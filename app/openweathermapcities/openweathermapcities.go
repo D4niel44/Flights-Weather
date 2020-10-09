@@ -1,5 +1,3 @@
-// TODO package documentation explaining database structure
-
 package openweathermapcities
 
 import (
@@ -49,8 +47,6 @@ func NewOwmCityConverter(dbPath string) (*OwmCityConverter, error) {
 func (citiesConverter *OwmCityConverter) Close() {
 	citiesConverter.citiesDB.Close()
 }
-
-// TODO explore changing coordinates  to its own module to avoid repetition.
 
 // GetCityCoordinates returns the city coordinates related to the given string, if any.
 // The string paramater may be both a city name or an airport IATA code.

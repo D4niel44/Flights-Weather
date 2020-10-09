@@ -4,7 +4,6 @@ import (
 	"testing"
 )
 
-// TODO remaining tests
 func TestGetCityCoordinates(t *testing.T) {
 	testCases := []struct {
 		testName string
