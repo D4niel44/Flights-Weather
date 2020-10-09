@@ -1,3 +1,11 @@
 .vscode/launch.json
 bin/db/cities.db
 scripts/scripts
+Makefile
+.idea/modules.xml
+.idea/P1-App.iml
+.idea/vcs.xml
+.idea/workspace.xml
+bin/weather
+bin/datasets/dataset1.csv
+bin/datasets/dataset2.csv
