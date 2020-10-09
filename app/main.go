@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	app := NewApp(API_KEY, DB_PATH)
+	app := NewApp(API_KEY, DB_PATH, MAX_QUERIES_PER_MINUTE)
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("Fatal error: ", r)

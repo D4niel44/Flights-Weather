@@ -12,7 +12,7 @@ const (
 	testDatasetPath = "../testDatasets/"
 )
 
-var app = NewApp(testAPIKey, testDBPath)
+var app = NewApp(testAPIKey, testDBPath, 40)
 
 func TestDataset1(t *testing.T) {
 	testDataset("dataset1.csv", t)

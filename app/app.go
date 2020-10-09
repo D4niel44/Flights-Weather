@@ -34,14 +34,16 @@ var defaultCity = City{
 
 // App struct that represents an App for querying cities weather.
 type App struct {
-	API *owm.API
-	DB  *owmCities.OwmCityConverter
+	API                 *owm.API
+	DB                  *owmCities.OwmCityConverter
+	QueriesCounter      int
+	MaxQueriesPerMinute int
 }
 
 // NewApp Creates A New App
-func NewApp(apiKey, dbPath string) *App {
+func NewApp(apiKey, dbPath string, maxQueriesPerMinute int) *App {
 	db, _ := owmCities.NewOwmCityConverter(dbPath)
-	return &App{API: owm.NewAPI(apiKey), DB: db}
+	return &App{API: owm.NewAPI(apiKey), DB: db, QueriesCounter: 0, MaxQueriesPerMinute: maxQueriesPerMinute}
 }
 
 // Close closes the underlying database connection, neccessary to run this app.
@@ -160,12 +162,12 @@ func addToCities(cities map[string]*City, city *City) *City {
 // from the database (for example when there is no connection to internet), this does not includes
 // when a weather query fails.
 func (app *App) QueryWeather(cities map[string]*City) {
-	queriesCounter := 0
 	for _, city := range cities {
-		if queriesCounter > 55 {
+		if app.QueriesCounter > app.MaxQueriesPerMinute {
 			time.Sleep(time.Minute)
-			queriesCounter = 0
+			app.QueriesCounter = 0
 		}
+		app.QueriesCounter++
 		var cityWeather *owm.Weather
 		var err error
 		if city.coordinate != nil {
@@ -181,7 +183,6 @@ func (app *App) QueryWeather(cities map[string]*City) {
 		} else {
 			city.weather = cityWeather
 		}
-		queriesCounter++
 	}
 }
 
