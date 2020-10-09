@@ -2,6 +2,7 @@ package main
 
 func main() {
 	app := NewApp(API_KEY, DB_PATH)
+	defer app.Close()
 	executeDataset(app, "dataset1.csv")
 	executeDataset(app, "dataset2.csv")
 }
