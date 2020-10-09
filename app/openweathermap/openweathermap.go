@@ -110,6 +110,8 @@ func makeQuery(url string) (*Weather, error) {
 	}
 	if resp.StatusCode == 404 {
 		return nil, errors.New("city not found")
+	} else if resp.StatusCode != 200 {
+		return nil, errors.New("unexpected return code")
 	}
 	defer resp.Body.Close()
 
