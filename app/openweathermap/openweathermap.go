@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	g "myp/Tarea01/app/geo"
 )
@@ -60,12 +61,13 @@ type WeatherData struct {
 
 // API represents an OpenWatherApi client to make climate and weather requests.
 type API struct {
-	hash string
+	hash   string
+	client http.Client
 }
 
 // NewAPI creates a new API instance with the given key.
 func NewAPI(hash string) *API {
-	return &API{hash: hash}
+	return &API{hash: hash, client: http.Client{Timeout: 5 * time.Second}}
 }
 
 // GetWeatherFromCity gets the weather for a given city.
@@ -79,7 +81,7 @@ func (api *API) GetWeatherFromCity(city string, units Units, lang Language) (*We
 	}
 	urlBuilder := api.baseURLBuilder(units, lang)
 	urlBuilder.addParameter("q", city)
-	return makeQuery(urlBuilder.makeURL())
+	return makeQuery(&api.client, urlBuilder.makeURL())
 }
 
 // GetWeatherFromCoordinates gets the weather for the given coordinate.
@@ -87,7 +89,7 @@ func (api *API) GetWeatherFromCoordinates(coordinate g.GeoPoint, units Units, la
 	urlBuilder := api.baseURLBuilder(units, lang)
 	urlBuilder.addParameter("lat", fmt.Sprintf("%.2f", coordinate.Latitude()))
 	urlBuilder.addParameter("lon", fmt.Sprintf("%.2f", coordinate.Longitude()))
-	return makeQuery(urlBuilder.makeURL())
+	return makeQuery(&api.client, urlBuilder.makeURL())
 }
 
 const baseURL = "https://api.openweathermap.org/data/2.5/weather?"
@@ -102,7 +104,7 @@ func (api *API) baseURLBuilder(units Units, lang Language) *getRequestURLBuilder
 }
 
 // Queries the url and returns and struct containing the response
-func makeQuery(url string) (*Weather, error) {
+func makeQuery(client *http.Client, url string) (*Weather, error) {
 	// make query
 	resp, err := http.Get(url)
 	if err != nil { // this kinds of errors should be fatal.
