@@ -105,8 +105,8 @@ func (api *API) baseURLBuilder(units Units, lang Language) *getRequestURLBuilder
 func makeQuery(url string) (*Weather, error) {
 	// make query
 	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
+	if err != nil { // this kinds of errors should be fatal.
+		panic(fmt.Errorf("%v", err))
 	}
 	if resp.StatusCode == 404 {
 		return nil, errors.New("city not found")
