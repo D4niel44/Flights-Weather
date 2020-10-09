@@ -14,9 +14,7 @@ clean:
 	rm -r bin && rm scripts/scripts
 
 compile:
-	cd src/proyecto1/app/ && go build
-	mv src/proyecto1/app/app bin/app
-
+	go build  -o bin/weather -i -pckgdir ./src/proyecto1 app geo openweathermap openweathermapcitites
 build:
 	make clean
 	make createDB

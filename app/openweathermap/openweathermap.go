@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	g "myp.ciencias.unam.mx/geo"
+	g "myp/Tarea01/app/geo"
 )
 
 // Units is an enum for temperature units in an Api response.

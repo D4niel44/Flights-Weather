@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	g "myp.ciencias.unam.mx/geo"
+	g "myp/Tarea01/app/geo"
 )
 
 const testAPIKey = "fc249a737bd3772566de957539505054"

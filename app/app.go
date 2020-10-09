@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	g "myp.ciencias.unam.mx/geo"
-	owm "myp.ciencias.unam.mx/proyecto1/openweathermap"
-	owmCities "myp.ciencias.unam.mx/proyecto1/openweathermapcities"
+	g "myp/Tarea01/app/geo"
+	owm "myp/Tarea01/app/openweathermap"
+	owmCities "myp/Tarea01/app/openweathermapcities"
 )
 
 // Flight is a struct representing a flight

@@ -3,13 +3,13 @@ package main
 import (
 	"testing"
 
-	g "myp.ciencias.unam.mx/geo"
+	g "myp/Tarea01/app/geo"
 )
 
 const (
 	testAPIKey      = "fc249a737bd3772566de957539505054"
-	testDBPath      = "../../../bin/db/cities.db"
-	testDatasetPath = "../../../testDatasets/"
+	testDBPath      = "../bin/db/cities.db"
+	testDatasetPath = "../testDatasets/"
 )
 
 var app = NewApp(testAPIKey, testDBPath)

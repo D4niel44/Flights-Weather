@@ -19,7 +19,7 @@ func TestGetCityCoordinates(t *testing.T) {
 		{"Country", "brazil"},
 	}
 	// Assumes NewOwmCityConverter works
-	cv, err := NewOwmCityConverter("../../../bin/db/cities.db")
+	cv, err := NewOwmCityConverter("../../bin/db/cities.db")
 	defer cv.Close()
 	if err != nil {
 		t.Errorf("Error while conecting to DB. \n %v", err)

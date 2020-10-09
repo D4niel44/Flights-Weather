@@ -15,7 +15,7 @@ import (
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 
-	g "myp.ciencias.unam.mx/geo"
+	g "myp/Tarea01/app/geo"
 )
 
 const (
