@@ -1,6 +1,5 @@
 package main
 
-// TODO Investigate separating module app from main.
 import (
 	"encoding/csv"
 	"errors"
@@ -45,6 +44,7 @@ func NewApp(apiKey, dbPath string) *App {
 	return &App{API: owm.NewAPI(apiKey), DB: db}
 }
 
+// Close closes the underlying database connection, neccessary to run this app.
 func (app *App) Close() {
 	app.DB.Close()
 }
@@ -60,16 +60,17 @@ func (app *App) Close() {
 //
 // The dataset must contain cloumns with some of the following data of origin a destination cities.
 // origin|origen name of the origin city.
-// destination|destino name of the destination city.
-// origin_latitude|latitud_origen origin city latitude coordinate
-// origin_longitude|longitud_origen origin city longitude coordinate
-// destination_latitude|latitud_destino destination city latitude coordinate
-// destination_longitude|longitud_destino destination city longitude coordinate
+// destination/destino name of the destination city.
+// origin_latitude origin city latitude coordinate
+// origin_longitude origin city longitude coordinate
+// destination_latitude destination city latitude coordinate
+// destination_longitude destination city longitude coordinate
 // This method will try to make all its cities ready to call owm API by coordinates
+// This method will panic if it cannot open datasets and or database.
 func (app *App) HandleDataSet(dataset string) (*[]*Flight, map[string]*City) {
 	fileReader, err := os.Open(dataset)
 	if err != nil {
-		panic("error reading dataset") // TODO dont stop because of this
+		panic("error reading dataset")
 	}
 	defer fileReader.Close()
 
@@ -151,10 +152,13 @@ func addToCities(cities map[string]*City, city *City) *City {
 	return city
 }
 
-// QueryWeather Requests the weather for all cities in the map and saves the result in
+// QueryWeather Tries to request the weather for all cities in the map and saves the result in
 // the wethaer field of city.
 //
 // Requires the weather field of city to be nil.
+// This method will panic if encounters a network error while trying to retrieve weather condition
+// from the database (for example when there is no connection to internet), this does not includes
+// when a weather query fails.
 func (app *App) QueryWeather(cities map[string]*City) {
 	queriesCounter := 0
 	for _, city := range cities {
