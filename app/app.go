@@ -50,8 +50,6 @@ func (app *App) Close() {
 	app.DB.Close()
 }
 
-// TODO Improve documentation.
-
 // HandleDataSet Process the file in the given path and returns a a list of all flights
 // in the dataset, and a map of unique cities by name to its respective city
 // structure.
