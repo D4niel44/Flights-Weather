@@ -9,8 +9,8 @@ Proyecto 1 Modelado y Programación 2021-1
 `make build`
 
 # Ejecutar
-- Una vez instalado se va a crear un ejecutable en bin/ con el nombre app, para ejecutarlo desde la raíz:
-`bin/app`
+- Una vez instalado se va a crear un ejecutable en bin/ con el nombre weather, para ejecutarlo desde la raíz:
+`bin/weather`
 
 ## Requisitos del Proyecto
 - [PDF](PDF/Proyecto01_WebService.pdf)
