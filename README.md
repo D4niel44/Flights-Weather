@@ -1,6 +1,17 @@
 # P1-App
 Proyecto 1 Modelado y Programación 2021-1
 
+# Requisitos
+- El único programa necesario para correr el proyecto es la última version de Go, la cual se puede descargar [aquí](https://golang.org/doc/install)
+
+# Instalación
+- Para instalar el programa basta con ejecutar:
+`make build`
+
+# Ejecutar
+- Una vez instalado se va a crear un ejecutable en bin/ con el nombre weather, para ejecutarlo desde la raíz:
+`bin/weather`
+
 ## Requisitos del Proyecto
 - [PDF](PDF/Proyecto01_WebService.pdf)
 
