@@ -1,4 +1,23 @@
 
 test:
 	cd src/proyecto1/openweathermap/ && go test -v
+	cd src/proyecto1/openweathermapcities/ && go test -v
 	cd src/proyecto1/app/ && go test -v
+
+createDB:
+	cd scripts/ && go build && ./scripts
+
+loadDatasets:
+	mkdir -p bin/datasets && cp datasets/* bin/datasets
+
+clean:
+	rm -r bin && rm scripts/scripts
+
+compile:
+	go build  -o bin/weather -i -pckgdir ./src/proyecto1 app geo openweathermap openweathermapcitites
+build:
+	make clean
+	make createDB
+	make loadDatasets
+	make test
+	make compile
