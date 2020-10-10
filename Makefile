@@ -1,6 +1,4 @@
 
-test:
-	go test -v myp/Tarea01/...
 
 createDB:
 	cd scripts && go build && ./scripts
@@ -13,6 +11,11 @@ clean:
 
 compile:
 	go build  -o bin/weather -i myp/Tarea01/app
+
+test:
+	make clean
+	make createDB
+	go test -v myp/Tarea01/...
 
 build:
 	make clean
