@@ -28,7 +28,7 @@ func testDataset(dataset string, t *testing.T) {
 	PrintWeather(flights)
 }
 
-// TestWueryTest runs simple test to check QueryTest is working
+// TestQueryTest runs simple test to check QueryTest is working
 func TestQuerySet(t *testing.T) {
 	cityName := "Mexico City"
 	city := City{
