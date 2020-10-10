@@ -1,4 +1,4 @@
-package openweathermapcities
+package openweathermap
 
 import (
 	"database/sql"

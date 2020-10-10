@@ -11,7 +11,6 @@ import (
 
 	g "myp/Tarea01/app/geo"
 	owm "myp/Tarea01/app/openweathermap"
-	owmCities "myp/Tarea01/app/openweathermapcities"
 )
 
 // Flight is a struct representing a flight
@@ -35,14 +34,14 @@ var defaultCity = City{
 // App struct that represents an App for querying cities weather.
 type App struct {
 	API                 *owm.API
-	DB                  *owmCities.OwmCityConverter
+	DB                  *owm.OwmCityConverter
 	QueriesCounter      int
 	MaxQueriesPerMinute int
 }
 
 // NewApp Creates A New App
 func NewApp(apiKey, dbPath string, maxQueriesPerMinute int) *App {
-	db, _ := owmCities.NewOwmCityConverter(dbPath)
+	db, _ := owm.NewOwmCityConverter(dbPath)
 	return &App{API: owm.NewAPI(apiKey), DB: db, QueriesCounter: 0, MaxQueriesPerMinute: maxQueriesPerMinute}
 }
 
@@ -94,7 +93,7 @@ func (app *App) HandleDataSet(dataset string) (*[]*Flight, map[string]*City) {
 	var flights []*Flight
 	cities := make(map[string]*City)
 	if index.origin == -1 || index.destination == -1 {
-		cities[owmCities.ToAlphaNumeric(defaultCity.name)] = &defaultCity
+		cities[owm.ToAlphaNumeric(defaultCity.name)] = &defaultCity
 	}
 	rows, err := csvReader.ReadAll()
 	if err != nil {
@@ -109,7 +108,7 @@ func (app *App) HandleDataSet(dataset string) (*[]*Flight, map[string]*City) {
 
 // FlightCreator is an auxiliar type for creating flights
 type FlightCreator struct {
-	db      *owmCities.OwmCityConverter
+	db      *owm.OwmCityConverter
 	index   *Index
 	flights []*Flight
 	cities  map[string]*City
@@ -160,7 +159,7 @@ func (fc *FlightCreator) createCity(row []string, cityI, latI, lonI int) *City {
 }
 
 func addToCities(cities map[string]*City, city *City) *City {
-	normalizedCityName := owmCities.ToAlphaNumeric(city.name)
+	normalizedCityName := owm.ToAlphaNumeric(city.name)
 	previousCity, found := cities[normalizedCityName]
 	if found {
 		if previousCity.coordinate == nil && city.coordinate != nil {
