@@ -1,6 +1,7 @@
 # P1-App
 Proyecto 1 Modelado y Programación 2021-1
 
+
 ## Requisitos
 Para ejecutar el proyecto correctamente se requiere de:
 - [Go v1.15](https://golang.org/doc/go1.15) o posterior
@@ -14,7 +15,7 @@ make test
 
 Para ejecutar se usa:
 `
-make build && bin/app
+make build && bin/weather
 `
 
 ## Análisis del Proyecto

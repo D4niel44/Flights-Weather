@@ -12,7 +12,7 @@ const (
 	testDatasetPath = "../testDatasets/"
 )
 
-var app = NewApp(testAPIKey, testDBPath)
+var app = NewApp(testAPIKey, testDBPath, 40)
 
 func TestDataset1(t *testing.T) {
 	testDataset("dataset1.csv", t)
@@ -28,8 +28,7 @@ func testDataset(dataset string, t *testing.T) {
 	PrintWeather(flights)
 }
 
-// TODO Improve tests to check no ban when more than 60 cities are requested.
-// TestWueryTest runs simple test to check QueryTest is working
+// TestQueryTest runs simple test to check QueryTest is working
 func TestQuerySet(t *testing.T) {
 	cityName := "Mexico City"
 	city := City{

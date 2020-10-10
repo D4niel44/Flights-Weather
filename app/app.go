@@ -1,6 +1,5 @@
 package main
 
-// TODO Investigate separating module app from main.
 import (
 	"encoding/csv"
 	"errors"
@@ -12,7 +11,6 @@ import (
 
 	g "myp/Tarea01/app/geo"
 	owm "myp/Tarea01/app/openweathermap"
-	owmCities "myp/Tarea01/app/openweathermapcities"
 )
 
 // Flight is a struct representing a flight
@@ -35,21 +33,22 @@ var defaultCity = City{
 
 // App struct that represents an App for querying cities weather.
 type App struct {
-	API *owm.API
-	DB  *owmCities.OwmCityConverter
+	API                 *owm.API
+	DB                  *owm.OwmCityConverter
+	QueriesCounter      int
+	MaxQueriesPerMinute int
 }
 
 // NewApp Creates A New App
-func NewApp(apiKey, dbPath string) *App {
-	db, _ := owmCities.NewOwmCityConverter(dbPath)
-	return &App{API: owm.NewAPI(apiKey), DB: db}
+func NewApp(apiKey, dbPath string, maxQueriesPerMinute int) *App {
+	db, _ := owm.NewOwmCityConverter(dbPath)
+	return &App{API: owm.NewAPI(apiKey), DB: db, QueriesCounter: 0, MaxQueriesPerMinute: maxQueriesPerMinute}
 }
 
+// Close closes the underlying database connection, neccessary to run this app.
 func (app *App) Close() {
 	app.DB.Close()
 }
-
-// TODO Improve documentation.
 
 // HandleDataSet Process the file in the given path and returns a a list of all flights
 // in the dataset, and a map of unique cities by name to its respective city
@@ -60,16 +59,17 @@ func (app *App) Close() {
 //
 // The dataset must contain cloumns with some of the following data of origin a destination cities.
 // origin|origen name of the origin city.
-// destination|destino name of the destination city.
-// origin_latitude|latitud_origen origin city latitude coordinate
-// origin_longitude|longitud_origen origin city longitude coordinate
-// destination_latitude|latitud_destino destination city latitude coordinate
-// destination_longitude|longitud_destino destination city longitude coordinate
+// destination/destino name of the destination city.
+// origin_latitude origin city latitude coordinate
+// origin_longitude origin city longitude coordinate
+// destination_latitude destination city latitude coordinate
+// destination_longitude destination city longitude coordinate
 // This method will try to make all its cities ready to call owm API by coordinates
+// This method will panic if it cannot open datasets and or database.
 func (app *App) HandleDataSet(dataset string) (*[]*Flight, map[string]*City) {
 	fileReader, err := os.Open(dataset)
 	if err != nil {
-		panic("error reading dataset") // TODO dont stop because of this
+		panic("error reading dataset")
 	}
 	defer fileReader.Close()
 
@@ -91,7 +91,7 @@ func (app *App) HandleDataSet(dataset string) (*[]*Flight, map[string]*City) {
 	var flights []*Flight
 	cities := make(map[string]*City)
 	if index.origin == -1 || index.destination == -1 {
-		cities[owmCities.ToAlphaNumeric(defaultCity.name)] = &defaultCity
+		cities[owm.ToAlphaNumeric(defaultCity.name)] = &defaultCity
 	}
 	rows, err := csvReader.ReadAll()
 	if err != nil {
@@ -102,6 +102,24 @@ func (app *App) HandleDataSet(dataset string) (*[]*Flight, map[string]*City) {
 		fc.addFlight(row)
 	}
 	return &fc.flights, cities
+}
+
+// FlightCreator is an auxiliar type for creating flights
+type FlightCreator struct {
+	db      *owm.OwmCityConverter
+	index   *Index
+	flights []*Flight
+	cities  map[string]*City
+}
+
+// Index is a struct representing indexes to csv columns
+type Index struct {
+	origin         int
+	destination    int
+	originLat      int
+	originLon      int
+	destinationLat int
+	detinationLon  int
 }
 
 func (fc *FlightCreator) addFlight(row []string) {
@@ -139,7 +157,7 @@ func (fc *FlightCreator) createCity(row []string, cityI, latI, lonI int) *City {
 }
 
 func addToCities(cities map[string]*City, city *City) *City {
-	normalizedCityName := owmCities.ToAlphaNumeric(city.name)
+	normalizedCityName := owm.ToAlphaNumeric(city.name)
 	previousCity, found := cities[normalizedCityName]
 	if found {
 		if previousCity.coordinate == nil && city.coordinate != nil {
@@ -151,17 +169,20 @@ func addToCities(cities map[string]*City, city *City) *City {
 	return city
 }
 
-// QueryWeather Requests the weather for all cities in the map and saves the result in
+// QueryWeather Tries to request the weather for all cities in the map and saves the result in
 // the wethaer field of city.
 //
 // Requires the weather field of city to be nil.
+// This method will panic if encounters a network error while trying to retrieve weather condition
+// from the database (for example when there is no connection to internet), this does not includes
+// when a weather query fails.
 func (app *App) QueryWeather(cities map[string]*City) {
-	queriesCounter := 0
 	for _, city := range cities {
-		if queriesCounter > 55 {
+		if app.QueriesCounter > app.MaxQueriesPerMinute {
 			time.Sleep(time.Minute)
-			queriesCounter = 0
+			app.QueriesCounter = 0
 		}
+		app.QueriesCounter++
 		var cityWeather *owm.Weather
 		var err error
 		if city.coordinate != nil {
@@ -172,29 +193,29 @@ func (app *App) QueryWeather(cities map[string]*City) {
 			err = errors.New("insuficcient data about city")
 		}
 		if err != nil {
-			// FIXME strange value bug.
-			fmt.Printf("ERROR: %v, \n", err) // TODO Rework this using logger
+			fmt.Printf("ERROR: city not supported %s \n", city.name)
 		} else {
 			city.weather = cityWeather
 		}
-		queriesCounter++
 	}
 }
-
-// TODO improve documentation.
 
 // PrintWeather Prints the weather to standard output
+// It prints information about max and min temperature,
+// humidity an a description as well for each fligth.
 func PrintWeather(flights *[]*Flight) {
+	fmt.Println()
 	for _, flight := range *flights {
-		fmt.Println("##########################")
+		fmt.Println("#############################")
 		printCityWeather("Origen", flight.origin)
-		fmt.Println("--------------------------")
+		fmt.Println("-----------------------------")
 		printCityWeather("Destino", flight.destination)
 	}
+	fmt.Println("#############################")
+	fmt.Println()
 }
 
-// TODO change this to class method?
-
+// Prints the weatherr for an specific city
 func printCityWeather(header string, city *City) {
 	fmt.Printf("%s: %s \n", header, city.name)
 	if city.weather == nil {
@@ -203,21 +224,6 @@ func printCityWeather(header string, city *City) {
 		fmt.Printf("Descripcion: %s \n", city.weather.Weather[0].Description)
 		fmt.Printf("Temperatura Mínima: %.1f °C\n", city.weather.Main.TempMin)
 		fmt.Printf("Temperatura Máxima: %.1f °C\n", city.weather.Main.TempMax)
-		fmt.Printf("Humedad: %.1f %% \n", city.weather.Main.Humidity)
+		fmt.Printf("Humedad: %.0f%% \n", city.weather.Main.Humidity)
 	}
-}
-
-type FlightCreator struct {
-	db      *owmCities.OwmCityConverter
-	index   *Index
-	flights []*Flight
-	cities  map[string]*City
-}
-type Index struct {
-	origin         int
-	destination    int
-	originLat      int
-	originLon      int
-	destinationLat int
-	detinationLon  int
 }

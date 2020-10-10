@@ -9,3 +9,4 @@ Makefile
 bin/weather
 bin/datasets/dataset1.csv
 bin/datasets/dataset2.csv
+bin/app
