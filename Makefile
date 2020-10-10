@@ -9,7 +9,7 @@ loadDatasets:
 	mkdir -p bin/datasets && cp datasets/* bin/datasets
 
 clean:
-	rm -r bin && rm scripts/scripts
+	rm -rf bin && rm -f scripts/scripts
 
 compile:
 	go build  -o bin/weather -i myp/Tarea01/app
