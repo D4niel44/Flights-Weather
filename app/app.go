@@ -107,6 +107,24 @@ func (app *App) HandleDataSet(dataset string) (*[]*Flight, map[string]*City) {
 	return &fc.flights, cities
 }
 
+// FlightCreator is an auxiliar type for creating flights
+type FlightCreator struct {
+	db      *owmCities.OwmCityConverter
+	index   *Index
+	flights []*Flight
+	cities  map[string]*City
+}
+
+// Index is a struct representing indexes to csv columns
+type Index struct {
+	origin         int
+	destination    int
+	originLat      int
+	originLon      int
+	destinationLat int
+	detinationLon  int
+}
+
 func (fc *FlightCreator) addFlight(row []string) {
 	if fc.index.origin == -1 && fc.index.destination == -1 {
 		fmt.Print("Not enough information about flight.")
@@ -178,26 +196,29 @@ func (app *App) QueryWeather(cities map[string]*City) {
 			err = errors.New("insuficcient data about city")
 		}
 		if err != nil {
-			// FIXME strange value bug.
-			fmt.Printf("ERROR: %v, \n", err)
+			fmt.Printf("ERROR: city not supported %s \n", city.name)
 		} else {
 			city.weather = cityWeather
 		}
 	}
 }
 
-// TODO improve documentation.
-
 // PrintWeather Prints the weather to standard output
+// It prints information about max and min temperature,
+// humidity an a description as well for each fligth.
 func PrintWeather(flights *[]*Flight) {
+	fmt.Println()
 	for _, flight := range *flights {
 		fmt.Println("#############################")
 		printCityWeather("Origen", flight.origin)
 		fmt.Println("-----------------------------")
 		printCityWeather("Destino", flight.destination)
 	}
+	fmt.Println("#############################")
+	fmt.Println()
 }
 
+// Prints the weatherr for an specific city
 func printCityWeather(header string, city *City) {
 	fmt.Printf("%s: %s \n", header, city.name)
 	if city.weather == nil {
@@ -208,19 +229,4 @@ func printCityWeather(header string, city *City) {
 		fmt.Printf("Temperatura Máxima: %.1f °C\n", city.weather.Main.TempMax)
 		fmt.Printf("Humedad: %.0f%% \n", city.weather.Main.Humidity)
 	}
-}
-
-type FlightCreator struct {
-	db      *owmCities.OwmCityConverter
-	index   *Index
-	flights []*Flight
-	cities  map[string]*City
-}
-type Index struct {
-	origin         int
-	destination    int
-	originLat      int
-	originLon      int
-	destinationLat int
-	detinationLon  int
 }
