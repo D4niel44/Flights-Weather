@@ -1,8 +1,28 @@
 # P1-App
 Proyecto 1 Modelado y Programación 2021-1
 
-## Requisitos del Proyecto
-- [PDF](PDF/Proyecto01_WebService.pdf)
+## Requisitos
+Para ejecutar el proyecto correctamente se requiere de:
+- [Go v1.15](https://golang.org/doc/go1.15) o posterior
+- [GNU make](https://www.gnu.org/software/make/manual/make.html)
+
+## Ejecución
+Para realizar las pruebas unitarias del proyecto se usa el comando:
+`
+make test
+`
+
+Para ejecutar se usa:
+`
+make build && bin/app
+`
+
+## Análisis del Proyecto
+- [Analisis](PDF/Proyecto1.pdf)
+
+
+## Reto
+- [PDF](PDF/Reto/Proyecto01_WebService.pdf)
 
 ## Enlaces Útiles
 - Apis:
@@ -17,9 +37,6 @@ Proyecto 1 Modelado y Programación 2021-1
   - Limite: 2000 requests al día.
 ### [OpenWeathermap](https://openweathermap.org/)
   - Limite: 60 requests por minuto.
-
-## Análisis del Proyecto
-- [Analisis](PDF/Análisis.pdf)
 
 ## Pruebas de la API
 - [Postman](https://app.getpostman.com/join-team?invite_code=80b7daf2eb1e0904270af63bed78494a)
