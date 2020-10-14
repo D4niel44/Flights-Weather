@@ -2,7 +2,7 @@ package main
 
 const (
 	// API_KEY Key to connect to openweathermap API
-	API_KEY = "f5945a52edc33c862b71cb618575e8a7"
+	API_KEY = // Use your own key
 	// DATASETS_PATH PATH to datasets once compiled
 	DATASETS_PATH = "datasets/"
 	// DB_PATH PATH to database once compiled
