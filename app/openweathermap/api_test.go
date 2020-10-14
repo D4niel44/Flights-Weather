@@ -7,7 +7,7 @@ import (
 	g "myp/Tarea01/app/geo"
 )
 
-const testAPIKey = "fc249a737bd3772566de957539505054"
+const testAPIKey = // Use your own API Key
 
 var api = &API{hash: testAPIKey}
 
