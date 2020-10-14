@@ -23,4 +23,4 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Test-OWM
-      run: go test -v myp/Tarea01/...
+      run: make build
