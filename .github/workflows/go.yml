@@ -23,6 +23,4 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Test-OWM
-      run: cd src/proyecto1/openweathermap/ && go test -v
-    - name: Test-App
-      run: cd src/proyecto1/app/ && go test -v
+      run: go test -v myp/Tarea01/...
